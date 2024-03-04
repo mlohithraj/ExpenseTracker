@@ -1,53 +1,61 @@
-import AuthContext from '../store/auth-context';
-import classes from './ProfileForm.module.css';
 import { useRef, useContext } from 'react';
-import { useHistory } from 'react-router-dom';
+import classes from './ProfileForm.module.css';
+import AuthContext from '../store/auth-context';
 
 const ProfileForm = () => {
-  const history = useHistory();
-  const newPasswordInputRef = useRef();
   const authCtx = useContext(AuthContext);
+  const nameInputRef = useRef();
+  const photoInputRef = useRef();
 
-  const submitHandler = (event) => {
+  const updateHandler = async (event) => {
     event.preventDefault();
 
-    const enteredNewPassword = newPasswordInputRef.current.value;
+    const enteredName = nameInputRef.current.value;
+    const enteredPhotoUrl = photoInputRef.current.value;
 
-    //validation
+    const idToken = authCtx.token;
+    const apiUrl = `https://identitytoolkit.googleapis.com/v1/accounts:update?key=AIzaSyAyA-q0e_kzrsBi07QnurND_HsTyTaiZBw`;
 
-    fetch(
-      'https://identitytoolkit.googleapis.com/v1/accounts:update?key=AIzaSyATsM8U38z0WQGEo8exGT9eE9QMsmbr8pE',
-      {
+    const requestBody = {
+      idToken: idToken,
+      displayName: enteredName,
+      photoUrl: enteredPhotoUrl,
+      returnSecureToken: true,
+    };
+
+    try {
+      const response = await fetch(apiUrl, {
         method: 'POST',
-        body: JSON.stringify({
-          idToken: authCtx.token,
-          password: enteredNewPassword,
-          returnSecureToken: false,
-        }),
+        body: JSON.stringify(requestBody),
         headers: {
           'Content-Type': 'application/json',
         },
-      },
-    ).then((res) => {
-      console.log(res);
-      history.replace('/');
-    });
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update profile');
+      }
+
+      const data = await response.json();
+      alert('Profile updated successfully:', data);
+    } catch (error) {
+      alert('Error updating profile:', error.message);
+    }
   };
 
   return (
-    <form className={classes.form}>
+    <form className={classes.form} onSubmit={updateHandler}>
       <div className={classes.control}>
-        <label htmlFor="new-password">New Password</label>
-        <input
-          type="password"
-          id="new-password"
-          minLength="7"
-          ref={newPasswordInputRef}
-        />
+        <label htmlFor="name">Full Name</label>
+        <input type="text" id="name" required ref={nameInputRef} />
       </div>
-      <div className={classes.action}>
-        <button onClick={submitHandler}>Change Password</button>
+      <div className={classes.control}>
+        <label>Profile Photo Url</label>
+        <input type="text" id="photoUrl" required ref={photoInputRef} />
       </div>
+      <button type="submit" className={classes.action}>
+        Update
+      </button>
     </form>
   );
 };

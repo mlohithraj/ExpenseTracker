@@ -6,3 +6,28 @@
 .starting h1 {
   font-size: 5rem;
 }
+
+.actions {
+  display: flex;
+  justify-content: center;
+  width: 500px;
+  height: 100px;
+  border: 1px solid;
+  margin-left: 500px;
+  font-size: 25px;
+}
+
+.actions .toggle {
+  margin-top: 1rem;
+  background-color: transparent;
+  color: rgb(67, 67, 215);
+  border: none;
+  padding: 0.15rem 1.5rem;
+  cursor: pointer;
+  font-size: 25px;
+}
+
+.actions .toggle:hover {
+  background-color: transparent;
+  color: rgb(33, 0, 246);
+}

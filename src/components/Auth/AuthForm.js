@@ -8,11 +8,13 @@ const AuthForm = () => {
   const history = useHistory();
   const emailInputRef = useRef();
   const passwordInputRef = useRef();
+  const confirmPasswordInputRef = useRef();
 
   const authCtx = useContext(AuthContext);
 
   const [isLogin, setIsLogin] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
+  const [confirmEnteredPassword, setConfirmEnteredPassword] = useState('');
 
   const switchAuthModeHandler = () => {
     setIsLogin((prevState) => !prevState);
@@ -24,14 +26,24 @@ const AuthForm = () => {
     const enteredEmail = emailInputRef.current.value;
     const enteredPassword = passwordInputRef.current.value;
 
+    if (!isLogin) {
+      const confirmEnteredPasswordValue = confirmPasswordInputRef.current.value;
+      setConfirmEnteredPassword(confirmEnteredPasswordValue);
+
+      if (enteredPassword !== confirmEnteredPasswordValue) {
+        alert('Password does not match. Please re-enter password...');
+        return;
+      }
+    }
+
     setIsLoading(true);
     let url;
     if (isLogin) {
       url =
-        'https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=AIzaSyATsM8U38z0WQGEo8exGT9eE9QMsmbr8pE';
+        'https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=AIzaSyAyA-q0e_kzrsBi07QnurND_HsTyTaiZBw';
     } else {
       url =
-        'https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=AIzaSyATsM8U38z0WQGEo8exGT9eE9QMsmbr8pE';
+        'https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=AIzaSyAyA-q0e_kzrsBi07QnurND_HsTyTaiZBw';
     }
 
     fetch(url, {
@@ -52,9 +64,6 @@ const AuthForm = () => {
         } else {
           return res.json().then((data) => {
             let errorMessage = 'Authentication Failed';
-            // if (data && data.error && data.error.message) {
-            //   errorMessage = data.error.message;
-            // }
 
             throw new Error(errorMessage);
           });
@@ -86,18 +95,32 @@ const AuthForm = () => {
             ref={passwordInputRef}
           />
         </div>
+        {!isLogin && (
+          <div className={classes.control}>
+            <label htmlFor="password">Confirm Password</label>
+            <input
+              type="password"
+              id="password"
+              required
+              ref={confirmPasswordInputRef}
+            />
+          </div>
+        )}
         <div className={classes.actions}>
           {!isLoading && <button>{isLogin ? 'Login' : 'Sign Up'}</button>}
           {isLoading && <p>Loading...</p>}
         </div>
         <div className={classes.actions}>
-          <button
-            type="button"
-            className={classes.toggle}
-            onClick={switchAuthModeHandler}
-          >
-            {isLogin ? 'Create new account' : 'Login with existing account'}
-          </button>
+          <p>
+            {isLogin ? "Don't have an Account?" : 'Have an Account?'}{' '}
+            <button
+              type="button"
+              className={classes.toggle}
+              onClick={switchAuthModeHandler}
+            >
+              {isLogin ? 'Sign Up' : 'Login'}
+            </button>
+          </p>
         </div>
       </form>
     </section>
