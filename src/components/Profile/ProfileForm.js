@@ -1,7 +1,6 @@
 import { useRef, useContext, useEffect, useState } from 'react';
 import classes from './ProfileForm.module.css';
 import AuthContext from '../store/auth-context';
-import { Link } from 'react-router-dom/cjs/react-router-dom.min';
 
 const ProfileForm = () => {
   const authCtx = useContext(AuthContext);
@@ -101,11 +100,9 @@ const ProfileForm = () => {
           defaultValue={initialPhotoUrl}
         />
       </div>
-      <Link to="/profile">
         <button type="submit" className={classes.action}>
           Update
         </button>
-      </Link>
     </form>
   );
 };
