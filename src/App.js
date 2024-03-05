@@ -7,6 +7,7 @@ import AuthPage from './pages/AuthPage';
 import HomePage from './pages/HomePage';
 import AuthContext from './components/store/auth-context';
 import VerifyEmail from './components/Profile/VerifyEmail';
+import ForgotPasswordForm from './components/Profile/ForgotPasswordForm';
 
 function App() {
   const autCtx = useContext(AuthContext);
@@ -29,6 +30,9 @@ function App() {
         <Route path="/verifyAccount">
           {autCtx.isLoggedIn && <VerifyEmail />}
           {!autCtx.isLoggedIn && <Redirect to="/auth" />}
+        </Route>
+        <Route path="/forgotPassword">
+          <ForgotPasswordForm />
         </Route>
         <Route path="*">
           <Redirect to="/" />

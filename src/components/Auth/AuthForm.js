@@ -3,6 +3,7 @@ import { useHistory } from 'react-router-dom';
 
 import classes from './AuthForm.module.css';
 import AuthContext from '../store/auth-context';
+import { Link } from 'react-router-dom/cjs/react-router-dom.min';
 
 const AuthForm = () => {
   const history = useHistory();
@@ -78,6 +79,10 @@ const AuthForm = () => {
       });
   };
 
+  const passwordResetHandler = () => {
+    history.replace('/forgotPassword');
+  };
+
   return (
     <section className={classes.auth}>
       <h1>{isLogin ? 'Login' : 'Sign Up'}</h1>
@@ -107,7 +112,9 @@ const AuthForm = () => {
           </div>
         )}
         <div className={classes.actions}>
-          {!isLoading && <button>{isLogin ? 'Login' : 'Sign Up'}</button>}
+          {
+            !isLoading && <button>{isLogin ? 'Login' : 'Sign Up'}</button>
+          }
           {isLoading && <p>Loading...</p>}
         </div>
         <div className={classes.actions}>
@@ -121,6 +128,17 @@ const AuthForm = () => {
               {isLogin ? 'Sign Up' : 'Login'}
             </button>
           </p>
+        </div>
+        <div className={classes.actions}>
+          {isLogin && (
+            <button
+              type="button"
+              className={classes.toggle}
+              onClick={passwordResetHandler}
+            >
+              Forgot Password?
+            </button>
+          )}
         </div>
       </form>
     </section>
