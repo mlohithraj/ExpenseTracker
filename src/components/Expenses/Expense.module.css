@@ -70,34 +70,31 @@
   border-color: #540d83;
 }
 
+/* Expense.module.css */
+
 .expense {
+  list-style-type: none;
   padding: 0;
-  width: 500px;
-  height: 500px;
-  margin: 10px solid black;
-  margin-left: 500px;
-  font-size: 20px;
+  margin-left: 550px;
 }
 
 .expense li {
-  display: flex;
-  /* justify-content: space-between; */
-  align-items: center;
-  border-bottom: 1px solid #ccc;
-}
-
-.expense li:last-child {
-  border-bottom: none;
+  width: 400px;
+  height: 100px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  margin-bottom: 10px;
+  padding: 10px;
 }
 
 .expense li div {
-  flex: 0.1;
-}
-
-.expense li div:first-child {
-  margin-right: 0.1rem;
+  margin-bottom: 5px;
 }
 
 .expense li div:last-child {
-  text-align: right;
+  margin-bottom: 0;
+}
+
+.expense li div:nth-child(odd) {
+  background-color: #f5f5f5;
 }

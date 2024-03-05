@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import classes from './Expense.module.css';
 
 const Expense = () => {
@@ -6,9 +6,32 @@ const Expense = () => {
   const amountInputRef = useRef();
   const descriptionInputRef = useRef();
   const categoryInputRef = useRef();
-  const expensesListRef = useRef([]);
+  const [expenses, setExpenses] = useState([]);
 
-  const addExpenseHandler = (event) => {
+  useEffect(() => {
+    fetchExpenses();
+  }, []);
+
+  const fetchExpenses = async () => {
+    try {
+      const response = await fetch(
+        'https://expense-tracker-c30e4-default-rtdb.asia-southeast1.firebasedatabase.app/expense-tracker.json',
+      );
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch expense data');
+      }
+
+      const data = await response.json();
+      if (data) {
+        setExpenses(Object.values(data));
+      }
+    } catch (error) {
+      alert('Error:', error.message);
+    }
+  };
+
+  const addExpenseHandler = async (event) => {
     event.preventDefault();
     const text = textInputRef.current.value;
     const amount = amountInputRef.current.value;
@@ -23,18 +46,32 @@ const Expense = () => {
       category: category,
     };
 
-    expensesListRef.current.push(newExpense);
+    try {
+      const response = await fetch(
+        'https://expense-tracker-c30e4-default-rtdb.asia-southeast1.firebasedatabase.app/expense-tracker.json',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(newExpense),
+        },
+      );
+
+      if (!response.ok) {
+        throw new Error('Failed to save expense data');
+      }
+
+      setExpenses((prevExpenses) => [...prevExpenses, newExpense]);
+    } catch (error) {
+      alert('Error:', error.message);
+    }
 
     textInputRef.current.value = '';
     amountInputRef.current.value = '';
     descriptionInputRef.current.value = '';
     categoryInputRef.current.value = '';
-
-    forceUpdate();
   };
-
-  const [, updateState] = React.useState();
-  const forceUpdate = React.useCallback(() => updateState({}), []);
 
   return (
     <section>
@@ -75,12 +112,12 @@ const Expense = () => {
       <div>
         <h2>Expenses</h2>
         <ul className={classes.expense}>
-          {expensesListRef.current.map((expense) => (
+          {expenses.map((expense) => (
             <li key={expense.id}>
-              <div>{expense.text}</div>
-              <div>{expense.amount}</div>
-              <div>{expense.description}</div>
-              <div>{expense.category}</div>
+              <div>Text: {expense.text}</div>
+              <div>Price: {expense.amount}</div>
+              <div>Description: {expense.description}</div>
+              <div>Category: {expense.category}</div>
             </li>
           ))}
         </ul>
