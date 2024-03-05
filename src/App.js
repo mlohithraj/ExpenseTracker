@@ -8,6 +8,7 @@ import HomePage from './pages/HomePage';
 import AuthContext from './components/store/auth-context';
 import VerifyEmail from './components/Profile/VerifyEmail';
 import ForgotPasswordForm from './components/Profile/ForgotPasswordForm';
+import Expense from './components/Expenses/Expense';
 
 function App() {
   const autCtx = useContext(AuthContext);
@@ -33,6 +34,9 @@ function App() {
         </Route>
         <Route path="/forgotPassword">
           <ForgotPasswordForm />
+        </Route>
+        <Route path='/expense'>
+          <Expense />
         </Route>
         <Route path="*">
           <Redirect to="/" />
