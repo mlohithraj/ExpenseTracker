@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Redirect } from 'react-router-dom';
 
 const AuthContext = React.createContext({
   token: '',
@@ -8,7 +9,6 @@ const AuthContext = React.createContext({
 });
 
 export const AuthContextProvider = (props) => {
-  // Load initial token from localStorage on component initialization
   const initialToken = localStorage.getItem('token');
   const [token, setToken] = useState(initialToken);
 
@@ -22,10 +22,11 @@ export const AuthContextProvider = (props) => {
   const logoutHandler = () => {
     setToken(null);
     localStorage.removeItem('token');
+    alert('Logged out succesfully');
+    <Redirect to="/auth" />;
   };
 
   useEffect(() => {
-    // Remove token from localStorage if user logs out
     if (!userIsLoggedIn) {
       localStorage.removeItem('token');
     }

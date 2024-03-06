@@ -48,10 +48,14 @@
   background-color: #f7f0fa;
 }
 
-.action {
-  margin-top: 1.5rem;
+.button {
   display: flex;
-  justify-content: center;
+  margin-left: -60px;
+}
+
+.action {
+  margin-top: 0.5rem;
+  display: flex;
   margin-left: 100px;
 }
 
@@ -80,7 +84,7 @@
 
 .expense li {
   width: 400px;
-  height: 100px;
+  height: 150px;
   border: 1px solid #ccc;
   border-radius: 5px;
   margin-bottom: 10px;

@@ -14,18 +14,25 @@ const Expense = () => {
 
   const fetchExpenses = async () => {
     try {
-      const response = await fetch(
-        'https://expense-tracker-c30e4-default-rtdb.asia-southeast1.firebasedatabase.app/expense-tracker.json',
-      );
+      let storedExpenses = localStorage.getItem('expenses');
+      if (!storedExpenses) {
+        const response = await fetch(
+          'https://expense-tracker-c30e4-default-rtdb.asia-southeast1.firebasedatabase.app/expense-tracker.json',
+        );
 
-      if (!response.ok) {
-        throw new Error('Failed to fetch expense data');
-      }
+        if (!response.ok) {
+          throw new Error('Failed to fetch expense data');
+        }
 
-      const data = await response.json();
-      if (data) {
-        setExpenses(Object.values(data));
+        const data = await response.json();
+        if (data) {
+          storedExpenses = Object.values(data);
+          localStorage.setItem('expenses', JSON.stringify(storedExpenses));
+        }
+      } else {
+        storedExpenses = JSON.parse(storedExpenses);
       }
+      setExpenses(storedExpenses);
     } catch (error) {
       alert('Error:', error.message);
     }
@@ -39,7 +46,6 @@ const Expense = () => {
     const category = categoryInputRef.current.value;
 
     const newExpense = {
-      id: Math.random().toString(),
       text: text,
       amount: +amount,
       description: description,
@@ -63,6 +69,10 @@ const Expense = () => {
       }
 
       setExpenses((prevExpenses) => [...prevExpenses, newExpense]);
+      localStorage.setItem(
+        'expenses',
+        JSON.stringify([...expenses, newExpense]),
+      );
     } catch (error) {
       alert('Error:', error.message);
     }
@@ -71,6 +81,44 @@ const Expense = () => {
     amountInputRef.current.value = '';
     descriptionInputRef.current.value = '';
     categoryInputRef.current.value = '';
+  };
+
+  const deleteExpenseHandler = async (text) => {
+    try {
+      const response = await fetch(
+        `https://expense-tracker-c30e4-default-rtdb.asia-southeast1.firebasedatabase.app/expense-tracker/${text}.json`,
+        {
+          method: 'DELETE',
+        },
+      );
+
+      if (!response.ok) {
+        throw new Error('Failed to delete expense');
+      }
+
+      setExpenses((prevExpenses) =>
+        prevExpenses.filter((expense) => expense.text !== text),
+      );
+      localStorage.setItem(
+        'expenses',
+        JSON.stringify(expenses.filter((expense) => expense.text !== text)),
+      );
+
+      console.log('Expense successfully deleted');
+    } catch (error) {
+      console.error('Error:', error.message);
+    }
+  };
+
+  const editExpenseHandler = async (text) => {
+    const expenseToEdit = expenses.find((expense) => expense.text === text);
+
+    textInputRef.current.value = expenseToEdit.text;
+    amountInputRef.current.value = expenseToEdit.amount;
+    descriptionInputRef.current.value = expenseToEdit.description;
+    categoryInputRef.current.value = expenseToEdit.category;
+
+    await deleteExpenseHandler(text);
   };
 
   return (
@@ -113,11 +161,26 @@ const Expense = () => {
         <h2>Expenses</h2>
         <ul className={classes.expense}>
           {expenses.map((expense) => (
-            <li key={expense.id}>
+            <li key={expense.text}>
               <div>Text: {expense.text}</div>
               <div>Price: {expense.amount}</div>
               <div>Description: {expense.description}</div>
               <div>Category: {expense.category}</div>
+              <div className={classes.button}>
+                <button
+                  onClick={() => deleteExpenseHandler(expense.text)}
+                  className={classes.action}
+                >
+                  Delete
+                </button>
+                <nobr />
+                <button
+                  onClick={() => editExpenseHandler(expense.text)}
+                  className={classes.action}
+                >
+                  Edit
+                </button>
+              </div>
             </li>
           ))}
         </ul>
