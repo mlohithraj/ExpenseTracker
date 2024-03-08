@@ -75,7 +75,7 @@ const AuthForm = () => {
         history.replace('/');
       })
       .catch((err) => {
-        alert(err.message);
+        alert(err.message + 'Wrong Email/ Password');
       });
   };
 

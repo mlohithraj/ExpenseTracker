@@ -1,4 +1,11 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import {
+  addExpense,
+  deleteExpense,
+  editExpense,
+  setExpenses,
+} from '../redux-store/expenseSlice';
 import classes from './Expense.module.css';
 
 const Expense = () => {
@@ -6,7 +13,9 @@ const Expense = () => {
   const amountInputRef = useRef();
   const descriptionInputRef = useRef();
   const categoryInputRef = useRef();
-  const [expenses, setExpenses] = useState([]);
+
+  const expenses = useSelector((state) => state.expense.expenses);
+  const dispatch = useDispatch();
 
   useEffect(() => {
     fetchExpenses();
@@ -32,7 +41,7 @@ const Expense = () => {
       } else {
         storedExpenses = JSON.parse(storedExpenses);
       }
-      setExpenses(storedExpenses);
+      dispatch(setExpenses(storedExpenses));
     } catch (error) {
       alert('Error:', error.message);
     }
@@ -68,7 +77,7 @@ const Expense = () => {
         throw new Error('Failed to save expense data');
       }
 
-      setExpenses((prevExpenses) => [...prevExpenses, newExpense]);
+      dispatch(addExpense(newExpense));
       localStorage.setItem(
         'expenses',
         JSON.stringify([...expenses, newExpense]),
@@ -96,17 +105,16 @@ const Expense = () => {
         throw new Error('Failed to delete expense');
       }
 
-      setExpenses((prevExpenses) =>
-        prevExpenses.filter((expense) => expense.text !== text),
-      );
+      dispatch(deleteExpense(text));
       localStorage.setItem(
         'expenses',
         JSON.stringify(expenses.filter((expense) => expense.text !== text)),
+        alert('Are you sure? You want to delete'),
       );
 
       console.log('Expense successfully deleted');
     } catch (error) {
-      console.error('Error:', error.message);
+      alert('Error:', error.message);
     }
   };
 
@@ -120,6 +128,8 @@ const Expense = () => {
 
     await deleteExpenseHandler(text);
   };
+
+  const totalAmount = expenses.reduce((acc, curr) => acc + curr.amount, 0);
 
   return (
     <section>
@@ -185,6 +195,9 @@ const Expense = () => {
           ))}
         </ul>
       </div>
+      {totalAmount > 10000 && (
+        <button className={classes.premiumButton}>Activate Premium</button>
+      )}
     </section>
   );
 };

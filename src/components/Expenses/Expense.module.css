@@ -99,6 +99,6 @@
   margin-bottom: 0;
 }
 
-.expense li div:nth-child(odd) {
-  background-color: #f5f5f5;
-}
+/* .expense li div:nth-child(odd) {
+    background-color: #f5f5f5;
+    } */

@@ -4,6 +4,7 @@ import classes from './MainNavigation.module.css';
 import { useContext } from 'react';
 import AuthContext from '../store/auth-context';
 
+
 const MainNavigation = () => {
   const authCtx = useContext(AuthContext);
 
