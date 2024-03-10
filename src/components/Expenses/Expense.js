@@ -1,5 +1,8 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
+
 import {
   addExpense,
   deleteExpense,
@@ -9,6 +12,7 @@ import {
 import classes from './Expense.module.css';
 
 const Expense = () => {
+  const [premiumActivated, setPremiumActivated] = useState(false);
   const textInputRef = useRef();
   const amountInputRef = useRef();
   const descriptionInputRef = useRef();
@@ -131,8 +135,46 @@ const Expense = () => {
 
   const totalAmount = expenses.reduce((acc, curr) => acc + curr.amount, 0);
 
+  const downloadExpensesAsPDF = () => {
+    const input = document.getElementById('expenses-list');
+
+    html2canvas(input).then((canvas) => {
+      const imgData = canvas.toDataURL('image/png');
+      const pdf = new jsPDF();
+      pdf.addImage(imgData, 'PNG', 0, 0);
+      pdf.save('expenses.pdf');
+    });
+  };
+
+  const activatePremium = () => {
+    setPremiumActivated(true);
+  };
+
+  const downloadFile = () => {
+    const download = document.getElementsByClassName('download')[0];
+    const blob = new Blob([JSON.stringify(expenses)], { type: 'text/plain' });
+    download.href = URL.createObjectURL(blob);
+  };
+
   return (
     <section>
+      <div className={classes.premiumBtn}>
+        {totalAmount > 10000 && (
+          <button className={classes.premiumButton} onClick={activatePremium}>
+            Activate Premium
+          </button>
+        )}
+        {premiumActivated && (
+          <a
+            href="#"
+            className="download"
+            download="expenses.txt"
+            onClick={downloadFile}
+          >
+            Download File
+          </a>
+        )}
+      </div>
       <form onSubmit={addExpenseHandler} className={classes.form}>
         <div className={classes.control}>
           <label>Enter Text</label>
@@ -169,7 +211,7 @@ const Expense = () => {
       </form>
       <div>
         <h2>Expenses</h2>
-        <ul className={classes.expense}>
+        <ul className={classes.expense} id="expenses-list">
           {expenses.map((expense) => (
             <li key={expense.text}>
               <div>Text: {expense.text}</div>
@@ -195,9 +237,6 @@ const Expense = () => {
           ))}
         </ul>
       </div>
-      {totalAmount > 10000 && (
-        <button className={classes.premiumButton}>Activate Premium</button>
-      )}
     </section>
   );
 };

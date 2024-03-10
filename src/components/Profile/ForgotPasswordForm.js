@@ -39,15 +39,17 @@ const ForgotPasswordForm = () => {
   };
 
   return (
-    <form onSubmit={forgotPasswordHandler} className={classes.form}>
-      <div className={classes.control}>
-        <label>Email Id</label>
-        <input type="email" required ref={emailInputRef} />
-      </div>
-      <button type="submit" className={classes.action}>
-        Submit
-      </button>
-    </form>
+    <div>
+      <form onSubmit={forgotPasswordHandler} className={classes.form}>
+        <div className={classes.control}>
+          <label>Email Id</label>
+          <input type="email" required ref={emailInputRef} />
+        </div>
+        <button type="submit" className={classes.action}>
+          Submit
+        </button>
+      </form>
+    </div>
   );
 };
 

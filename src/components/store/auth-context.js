@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext, createContext } from 'react';
 import { Redirect } from 'react-router-dom';
 
 const AuthContext = React.createContext({
@@ -7,6 +7,8 @@ const AuthContext = React.createContext({
   login: (token) => {},
   logout: () => {},
 });
+
+// const ThemeContext = createContext()
 
 export const AuthContextProvider = (props) => {
   const initialToken = localStorage.getItem('token');
@@ -39,11 +41,32 @@ export const AuthContextProvider = (props) => {
     logout: logoutHandler,
   };
 
+
+
   return (
     <AuthContext.Provider value={contextValue}>
       {props.children}
     </AuthContext.Provider>
   );
 };
+  // export const useTheme = () => {
+  //   useContext(ThemeContext);
+  // };
+
+  // export const ThemeProvider = (children) => {
+  //   const [isDarkMode, setIsDarkMode] = useState(false)
+
+  //   const toggleTheme = () => {
+  //     setIsDarkMode((prevState) => !prevState)
+  //   }
+
+  //   const theme = isDarkMode ? "dark" : "light"
+
+  //   return (
+  //     <ThemeContext.Provider value={{theme, toggleTheme}}>
+  //       {children}
+  //     </ThemeContext.Provider>
+  //   )
+  // }
 
 export default AuthContext;
