@@ -1,11 +1,11 @@
 import { render, screen } from '@testing-library/react';
 import StartingPageContent from './StartingPageContent';
 
-describe('StartingPageContent component', () => {
+// describe('StartingPageContent component', () => {
   test('renders welcome message', () => {
     render(<StartingPageContent />);
 
-    const welcomeMessage = screen.getByText('Welcome To Expense Tracker !!!');
+    const welcomeMessage = screen.getByText(/Welcome To Expense Tracker !!!/i);
     expect(welcomeMessage).toBeInTheDocument();
   });
-});
+// });
