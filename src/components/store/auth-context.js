@@ -4,28 +4,30 @@ import { Redirect } from 'react-router-dom';
 const AuthContext = React.createContext({
   token: '',
   isLoggedIn: false,
+  userEmail: '',
   login: (token) => {},
   logout: () => {},
 });
 
-// const ThemeContext = createContext()
-
 export const AuthContextProvider = (props) => {
   const initialToken = localStorage.getItem('token');
   const [token, setToken] = useState(initialToken);
+  const [userEmail, setUserEmail] = useState(initialToken)
 
   const userIsLoggedIn = !!token;
 
-  const loginHandler = (token) => {
+  const loginHandler = (token, email) => {
     setToken(token);
+    setUserEmail(email);
     localStorage.setItem('token', token);
+    localStorage.setItem('email', email);
   };
 
   const logoutHandler = () => {
     setToken(null);
     localStorage.removeItem('token');
     alert('Logged out succesfully');
-    <Redirect to="/auth" />;
+    return <Redirect to="/auth" />;
   };
 
   useEffect(() => {
@@ -37,11 +39,10 @@ export const AuthContextProvider = (props) => {
   const contextValue = {
     token: token,
     isLoggedIn: userIsLoggedIn,
+    userEmail: userEmail,
     login: loginHandler,
     logout: logoutHandler,
   };
-
-
 
   return (
     <AuthContext.Provider value={contextValue}>
@@ -49,24 +50,5 @@ export const AuthContextProvider = (props) => {
     </AuthContext.Provider>
   );
 };
-  // export const useTheme = () => {
-  //   useContext(ThemeContext);
-  // };
-
-  // export const ThemeProvider = (children) => {
-  //   const [isDarkMode, setIsDarkMode] = useState(false)
-
-  //   const toggleTheme = () => {
-  //     setIsDarkMode((prevState) => !prevState)
-  //   }
-
-  //   const theme = isDarkMode ? "dark" : "light"
-
-  //   return (
-  //     <ThemeContext.Provider value={{theme, toggleTheme}}>
-  //       {children}
-  //     </ThemeContext.Provider>
-  //   )
-  // }
 
 export default AuthContext;

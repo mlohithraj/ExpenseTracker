@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
@@ -9,6 +9,7 @@ import {
   editExpense,
   setExpenses,
 } from '../redux-store/expenseSlice';
+import AuthContext from '../store/auth-context';
 import classes from './Expense.module.css';
 
 const Expense = () => {
@@ -17,7 +18,7 @@ const Expense = () => {
   const amountInputRef = useRef();
   const descriptionInputRef = useRef();
   const categoryInputRef = useRef();
-
+  const authCtx = useContext(AuthContext);
   const expenses = useSelector((state) => state.expense.expenses);
   const dispatch = useDispatch();
 
@@ -26,11 +27,12 @@ const Expense = () => {
   }, []);
 
   const fetchExpenses = async () => {
+    const email = authCtx.userEmail.replace(/[.@]/g, '');
     try {
       let storedExpenses = localStorage.getItem('expenses');
       if (!storedExpenses) {
         const response = await fetch(
-          'https://expense-tracker-c30e4-default-rtdb.asia-southeast1.firebasedatabase.app/expense-tracker.json',
+          `https://expense-tracker-c30e4-default-rtdb.asia-southeast1.firebasedatabase.app/${email}/expense-tracker.json`,
         );
 
         if (!response.ok) {
@@ -65,9 +67,11 @@ const Expense = () => {
       category: category,
     };
 
+    const email = authCtx.userEmail.replace(/[@.]/g, '');
+
     try {
       const response = await fetch(
-        'https://expense-tracker-c30e4-default-rtdb.asia-southeast1.firebasedatabase.app/expense-tracker.json',
+        `https://expense-tracker-c30e4-default-rtdb.asia-southeast1.firebasedatabase.app/${email}/expense-tracker.json`,
         {
           method: 'POST',
           headers: {
@@ -80,6 +84,9 @@ const Expense = () => {
       if (!response.ok) {
         throw new Error('Failed to save expense data');
       }
+
+      const data = await response.json();
+      newExpense.id = data.name;
 
       dispatch(addExpense(newExpense));
       localStorage.setItem(
@@ -96,10 +103,12 @@ const Expense = () => {
     categoryInputRef.current.value = '';
   };
 
-  const deleteExpenseHandler = async (text) => {
+  const deleteExpenseHandler = async (id) => {
+    const email = authCtx.userEmail.replace(/[@.]/g, '');
+
     try {
       const response = await fetch(
-        `https://expense-tracker-c30e4-default-rtdb.asia-southeast1.firebasedatabase.app/expense-tracker/${text}.json`,
+        `https://expense-tracker-c30e4-default-rtdb.asia-southeast1.firebasedatabase.app/${id}/expense-tracker.json`,
         {
           method: 'DELETE',
         },
@@ -109,28 +118,37 @@ const Expense = () => {
         throw new Error('Failed to delete expense');
       }
 
-      dispatch(deleteExpense(text));
+      dispatch(deleteExpense(id));
       localStorage.setItem(
         'expenses',
-        JSON.stringify(expenses.filter((expense) => expense.text !== text)),
-        alert('Are you sure? You want to delete'),
+        JSON.stringify(expenses.filter((expense) => expense.id !== id)),
       );
-
-      console.log('Expense successfully deleted');
     } catch (error) {
       alert('Error:', error.message);
     }
   };
 
-  const editExpenseHandler = async (text) => {
-    const expenseToEdit = expenses.find((expense) => expense.text === text);
+  const editExpenseHandler = async (id) => {
+    const expenseToEdit = expenses.find((expense) => expense.id === id);
 
     textInputRef.current.value = expenseToEdit.text;
     amountInputRef.current.value = expenseToEdit.amount;
     descriptionInputRef.current.value = expenseToEdit.description;
     categoryInputRef.current.value = expenseToEdit.category;
 
-    await deleteExpenseHandler(text);
+    // Submit the edited expense data
+    const editedExpense = {
+      text: textInputRef.current.value,
+      amount: +amountInputRef.current.value,
+      description: descriptionInputRef.current.value,
+      category: categoryInputRef.current.value,
+    };
+
+    // Dispatch the editExpense action to update the expense in Redux state
+    dispatch(editExpense({ id, editedExpense }));
+
+    // Delete the original expense from the database
+    await deleteExpenseHandler(id);
   };
 
   const totalAmount = expenses.reduce((acc, curr) => acc + curr.amount, 0);
@@ -211,23 +229,23 @@ const Expense = () => {
       </form>
       <div>
         <h2>Expenses</h2>
-        <ul className={classes.expense} id="expenses-list">
+        <ul className={classes.expense}>
           {expenses.map((expense) => (
-            <li key={expense.text}>
+            <li key={expense.id}>
               <div>Text: {expense.text}</div>
               <div>Price: {expense.amount}</div>
               <div>Description: {expense.description}</div>
               <div>Category: {expense.category}</div>
               <div className={classes.button}>
                 <button
-                  onClick={() => deleteExpenseHandler(expense.text)}
+                  onClick={() => deleteExpenseHandler(expense.id)}
                   className={classes.action}
                 >
                   Delete
                 </button>
                 <nobr />
                 <button
-                  onClick={() => editExpenseHandler(expense.text)}
+                  onClick={() => editExpenseHandler(expense.id)}
                   className={classes.action}
                 >
                   Edit

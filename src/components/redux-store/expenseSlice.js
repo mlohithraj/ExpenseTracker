@@ -13,12 +13,12 @@ const expenseSlice = createSlice({
     },
     deleteExpense(state, action) {
       state.expenses = state.expenses.filter(
-        (expense) => expense.text !== action.payload,
+        (expense) => expense.id !== action.payload,
       );
     },
     editExpense(state, action) {
       const index = state.expenses.findIndex(
-        (expense) => expense.text === action.payload.text,
+        (expense) => expense.id === action.payload.id,
       );
       state.expenses[index] = action.payload;
     },
